@@ -30,57 +30,46 @@ class DatabaseHelper {
           "CREATE TABLE qrcodes(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, text TEXT)");
     });
   }
-  // void main() async {
-    // final database = openDatabase(
-    //   join(await getDatabasesPath(), 'qrcodes_database.db'),
-    //   onCreate: (db, version) {
-    //     return db.execute(
-    //       "CREATE TABLE qrcodes(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, text TEXT)",
-    //     );
-    //   },
-    //   version: 1,
-    // );
   
-    Future<void> insertQrcode(QRCode qrCode) async {
-      final db = await database;
-      await db.insert(
-        QRCode.tableName, 
-        qrCode.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace
+  Future<void> insertQrcode(QRCode qrCode) async {
+    final db = await database;
+    await db.insert(
+      QRCode.tableName, 
+      qrCode.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace
+    );
+  }
+
+  Future<List<QRCode>> retrieveQrcodes() async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps = await db.query(QRCode.tableName);
+
+    return List.generate(maps.length, (i) {
+      return QRCode(
+        id: maps[i]['id'],
+        text: maps[i]['text'],
       );
-    }
+    });
+  }
 
-    Future<List<QRCode>> retrieveQrcodes() async {
-      final db = await database;
+  Future<void> updateQrcode(QRCode qrCode) async {
+    final db = await database;
 
-      final List<Map<String, dynamic>> maps = await db.query(QRCode.tableName);
+    await db.update(
+      QRCode.tableName, 
+      qrCode.toMap(),
+      where: 'id = ?',
+      whereArgs: [qrCode.id],
+      conflictAlgorithm: ConflictAlgorithm.replace);
+  }
 
-      return List.generate(maps.length, (i) {
-        return QRCode(
-          id: maps[i]['id'],
-          text: maps[i]['text'],
-        );
-      });
-    }
-
-    Future<void> updateQrcode(QRCode qrCode) async {
-      final db = await database;
-
-      await db.update(
-        QRCode.tableName, 
-        qrCode.toMap(),
-        where: 'id = ?',
-        whereArgs: [qrCode.id],
-        conflictAlgorithm: ConflictAlgorithm.replace);
-    }
-
-    Future<void> deleteQrcode(int id) async {
-      var db = await database;
-      await db.delete(
-        QRCode.tableName, 
-        where: 'id = ?', 
-        whereArgs: [id]
-      );
-    }
-  // }
+  Future<void> deleteQrcode(int id) async {
+    var db = await database;
+    await db.delete(
+      QRCode.tableName, 
+      where: 'id = ?', 
+      whereArgs: [id]
+    );
+  }
 }

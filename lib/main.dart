@@ -1,8 +1,5 @@
 import 'package:provider/provider.dart';
-// import 'home.dart';
 
-// import 'generator.dart';
-// import 'history.dart';
 import 'scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
